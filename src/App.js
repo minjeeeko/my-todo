@@ -204,12 +204,12 @@ export default function App() {
           {/* ── 회고 뷰 ── */}
           {view === 'retro' && <>
             <div className="todo-header">
-              <button className="back-btn" onClick={() => setView('todo')}>← 할 일</button>
-              <button className="close-btn" onClick={close}>✕</button>
+              <span className="todo-title">오늘 회고</span>
+              <button className="close-btn" onClick={() => setView('todo')}>✕</button>
             </div>
 
             <div className="retro-panel">
-              <div className="retro-date">{todayLabel()} 회고</div>
+              <div className="retro-date">{todayLabel()}</div>
               <textarea
                 className="retro-textarea"
                 value={retro}
@@ -217,6 +217,10 @@ export default function App() {
                 placeholder={"오늘 하루 어땠나요?\n잘 한 것, 아쉬운 것, 내일 할 것들을 자유롭게 적어보세요 ✏️"}
                 autoFocus
               />
+            </div>
+
+            <div className="retro-footer">
+              <button className="save-btn" onClick={() => setView('todo')}>저장하기</button>
             </div>
           </>}
 
