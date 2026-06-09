@@ -29,6 +29,7 @@
     "appId": "com.halilmandu.app",
     "productName": "할일만두",
     "copyright": "Copyright © 2026 할일만두",
+    "extends": null,
     "asar": true,
     "extraMetadata": {
       "main": "electron/main.js"
