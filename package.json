@@ -26,6 +26,10 @@
   },
   "build": {
     "appId": "com.mytodo.app",
-    "productName": "My Todo"
+    "productName": "My Todo",
+    "files": [
+      "build/**/*",
+      "electron/**/*"
+    ]
   }
 }

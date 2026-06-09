@@ -17,14 +17,59 @@ body,
   width: 200px;
   height: 200px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-bottom: 16px;
   background: transparent;
 }
 
-.mascot-body {
-  font-size: 100px;
-  line-height: 1;
+/* 말풍선 */
+.speech-bubble {
+  position: relative;
+  background: #ffffff;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #333;
+  white-space: nowrap;
+  margin-bottom: 6px;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 6px 0 6px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+  filter: drop-shadow(0 2px 0 #ddd);
+}
+
+/* 캐릭터 이미지 */
+.mascot-character {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
   cursor: pointer;
   user-select: none;
+  animation: float 2.5s ease-in-out infinite;
+}
+
+/* 둥실둥실 애니메이션 */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* 말풍선 페이드인 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
