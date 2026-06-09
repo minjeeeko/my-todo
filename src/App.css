@@ -55,8 +55,10 @@ html, body, #root {
 .speech-bubble {
   position: relative;
   background: #ffffff;
-  border: 2.5px solid #111;
-  border-radius: 14px 16px 12px 15px / 12px 14px 16px 13px;
+  border: 3.5px solid #111;
+  border-radius: 18px 10px 20px 8px / 8px 20px 10px 18px;
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
   padding: 6px 13px;
   font-size: 15px;
   font-family: 'OngleipKonkon', cursive;
@@ -64,17 +66,16 @@ html, body, #root {
   white-space: nowrap;
   margin-bottom: 6px;
   transition: opacity 0.4s ease;
-  box-shadow: none;
-  transform: rotate(-1deg);
+  transform: rotate(-1.5deg);
 }
 
 .speech-bubble::after {
   content: '';
   position: absolute;
-  bottom: -11px;
+  bottom: -13px;
   left: 50%;
-  transform: translateX(-50%);
-  border-width: 9px 6px 0 6px;
+  transform: translateX(-60%);
+  border-width: 11px 7px 0 7px;
   border-style: solid;
   border-color: #111 transparent transparent transparent;
 }
@@ -82,10 +83,10 @@ html, body, #root {
 .speech-bubble::before {
   content: '';
   position: absolute;
-  bottom: -7px;
+  bottom: -8px;
   left: 50%;
-  transform: translateX(-50%);
-  border-width: 7px 5px 0 5px;
+  transform: translateX(-60%);
+  border-width: 8px 5px 0 5px;
   border-style: solid;
   border-color: #ffffff transparent transparent transparent;
   z-index: 1;
@@ -119,9 +120,10 @@ html, body, #root {
   width: 300px;
   height: 262px;
   background: #ffffff;
-  border: 2.5px solid #111;
-  border-radius: 18px 14px 16px 15px / 14px 18px 13px 16px;
-  box-shadow: none;
+  border: 3.5px solid #111;
+  border-radius: 22px 8px 18px 12px / 10px 20px 8px 22px;
+  outline: 1.5px solid #111;
+  outline-offset: 2px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
