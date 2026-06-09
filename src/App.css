@@ -21,25 +21,19 @@ html, body, #root {
 
 /* ── 루트 컨테이너 ── */
 .app-root {
-  width: 200px;
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-end;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
   background: transparent;
 }
 
-.app-root.expanded {
-  width: 320px;
-  height: 480px;
-}
-
-/* ── 마스코트 영역 ── */
+/* ── 마스코트 영역: 항상 우측 하단 고정 ── */
 .mascot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   width: 200px;
   height: 200px;
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,7 +47,7 @@ html, body, #root {
   cursor: grabbing;
 }
 
-.app-root.expanded .mascot {
+.expanded .mascot {
   cursor: default;
 }
 
@@ -117,11 +111,13 @@ html, body, #root {
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
-/* ── 할일 패널 ── */
+/* ── 할일 패널: 캐릭터 바로 위에 절대 위치 ── */
 .todo-panel {
+  position: absolute;
+  bottom: 208px;
+  right: 10px;
   width: 300px;
-  flex: 1;
-  min-height: 0;
+  height: 262px;
   background: #ffffff;
   border: 2.5px solid #111;
   border-radius: 18px 14px 16px 15px / 14px 18px 13px 16px;
@@ -129,8 +125,6 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-bottom: 8px;
-  margin-right: 10px;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 

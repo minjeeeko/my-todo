@@ -105,7 +105,8 @@ export default function App() {
 
   // ── 창 크기 ─────────────────────────────────────────────────────────
   function resizeWindow(expand) {
-    api?.setWindowSize(expand ? 320 : 200, expand ? 480 : 200);
+    // 패널(262) + gap(8) + 캐릭터(200) = 470
+    api?.setWindowSize(expand ? 320 : 200, expand ? 470 : 200);
   }
 
   function open() {
@@ -119,8 +120,9 @@ export default function App() {
     setTimeout(() => {
       setExpanded(false);
       setView('todo');
-      resizeWindow(false);
     }, 300);
+    // 창 축소는 패널 애니메이션과 동시에 시작 (캐릭터는 절대위치라 영향 없음)
+    setTimeout(() => resizeWindow(false), 150);
   }
 
   async function changeFolder() {
