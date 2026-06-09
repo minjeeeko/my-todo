@@ -27,8 +27,8 @@ export default function App() {
   const [panelVisible, setPanelVisible] = useState(false);
   const [saveFolder, setSaveFolder]     = useState(null);
 
-  // todos ref: 종료 시 최신값 전달용
-  const todosRef = useRef(todos);
+  const todosRef  = useRef(todos);
+  const isDragging = useRef(false);
   useEffect(() => { todosRef.current = todos; }, [todos]);
 
   const total   = todos.length;
@@ -55,24 +55,45 @@ export default function App() {
   useEffect(() => {
     if (!api) return;
     api.getSaveFolder().then(folder => {
-      if (folder) {
-        setSaveFolder(folder);
-      } else {
-        // 폴더 미설정 → 다이얼로그 표시
-        api.selectFolder().then(selected => {
-          if (selected) setSaveFolder(selected);
-        });
-      }
+      if (folder) setSaveFolder(folder);
+      else api.selectFolder().then(s => { if (s) setSaveFolder(s); });
     });
   }, []);
 
   // ── 종료 시 저장 ────────────────────────────────────────────────────
   useEffect(() => {
     if (!api) return;
-    api.onRequestSave(() => {
-      api.readyToClose(todosRef.current);
-    });
+    api.onRequestSave(() => api.readyToClose(todosRef.current));
   }, []);
+
+  // ── mouseup 전역: 드래그 종료 ───────────────────────────────────────
+  useEffect(() => {
+    const onUp = () => {
+      if (isDragging.current) {
+        isDragging.current = false;
+        api?.endDrag();
+      }
+    };
+    window.addEventListener('mouseup', onUp);
+    return () => window.removeEventListener('mouseup', onUp);
+  }, []);
+
+  // ── 마스코트 드래그 시작 ─────────────────────────────────────────────
+  async function handleMascotMouseDown(e) {
+    if (e.button !== 0 || !api) return;
+    e.preventDefault();
+
+    const pos = await api.getWindowPosition(); // [x, y]
+    const offset = { x: e.screenX - pos[0], y: e.screenY - pos[1] };
+    isDragging.current = true;
+    api.startDrag(offset);
+  }
+
+  // mouseup이 드래그 후 click으로 이어지지 않도록: 드래그 여부로 open 차단
+  function handleMascotClick(e) {
+    if (isDragging.current) return;
+    if (!expanded) open();
+  }
 
   // ── 창 크기 IPC ─────────────────────────────────────────────────────
   function resizeWindow(expand) {
@@ -93,7 +114,6 @@ export default function App() {
     }, 300);
   }
 
-  // ── 저장 폴더 변경 ──────────────────────────────────────────────────
   async function changeFolder() {
     if (!api) return;
     const selected = await api.selectFolder();
@@ -160,19 +180,22 @@ export default function App() {
 
           <div className="todo-footer">
             <span className="footer-count">완료 {checked}개 / 전체 {total}개</span>
-            <button className="folder-btn" onClick={changeFolder}>
-              저장 폴더 변경
-            </button>
+            <button className="folder-btn" onClick={changeFolder}>저장 폴더 변경</button>
           </div>
         </div>
       )}
 
-      <div className="mascot" onClick={!expanded ? open : undefined}>
+      <div
+        className="mascot"
+        onMouseDown={handleMascotMouseDown}
+        onClick={handleMascotClick}
+      >
         <div className={`speech-bubble ${visible ? 'show' : 'hide'}`}>{message}</div>
         <img
           className={`mascot-character ${visible ? 'show' : 'hide'}`}
           src={CHARACTER[mood]}
           alt="mascot"
+          draggable="false"
         />
       </div>
     </div>

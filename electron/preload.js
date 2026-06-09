@@ -1,9 +1,15 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  setWindowSize:  (width, height) => ipcRenderer.invoke('set-window-size', { width, height }),
-  getSaveFolder:  ()              => ipcRenderer.invoke('get-save-folder'),
-  selectFolder:   ()              => ipcRenderer.invoke('select-folder'),
-  onRequestSave:  (callback)      => ipcRenderer.on('request-save', callback),
-  readyToClose:   (todos)         => ipcRenderer.send('ready-to-close', todos),
+  // 창 크기/위치
+  setWindowSize:     (width, height) => ipcRenderer.invoke('set-window-size', { width, height }),
+  getWindowPosition: ()              => ipcRenderer.invoke('get-window-position'),
+  startDrag:         (offset)        => ipcRenderer.send('start-drag', offset),
+  endDrag:           ()              => ipcRenderer.send('end-drag'),
+
+  // 저장
+  getSaveFolder: () => ipcRenderer.invoke('get-save-folder'),
+  selectFolder:  () => ipcRenderer.invoke('select-folder'),
+  onRequestSave: (cb) => ipcRenderer.on('request-save', cb),
+  readyToClose:  (todos) => ipcRenderer.send('ready-to-close', todos),
 });

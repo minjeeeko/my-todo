@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -9,7 +11,7 @@ html, body, #root {
   height: 100vh;
   background: transparent;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Nanum Pen Script', cursive;
 }
 
 /* ── 루트 컨테이너 ── */
@@ -39,38 +41,55 @@ html, body, #root {
   justify-content: flex-end;
   padding-bottom: 16px;
   background: transparent;
-  cursor: pointer;
+  cursor: grab;
+}
+
+.mascot:active {
+  cursor: grabbing;
 }
 
 .app-root.expanded .mascot {
   cursor: default;
 }
 
-/* ── 말풍선 ── */
+/* ── 말풍선 (로파이 스케치 스타일) ── */
 .speech-bubble {
   position: relative;
-  background: #ffffff;
-  border: 2px solid #ddd;
-  border-radius: 12px;
-  padding: 6px 12px;
-  font-size: 12px;
-  color: #333;
+  background: #fef9ef;
+  border: 2.5px solid #5c4a32;
+  border-radius: 14px 16px 12px 15px / 12px 14px 16px 13px;
+  padding: 6px 13px;
+  font-size: 15px;
+  font-family: 'Nanum Pen Script', cursive;
+  color: #3d2f1e;
   white-space: nowrap;
   margin-bottom: 6px;
   transition: opacity 0.4s ease;
-  pointer-events: none;
+  box-shadow: 2px 3px 0px #c8b89a;
+  transform: rotate(-1deg);
 }
 
 .speech-bubble::after {
   content: '';
   position: absolute;
-  bottom: -9px;
+  bottom: -11px;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 8px 6px 0 6px;
+  border-width: 9px 6px 0 6px;
   border-style: solid;
-  border-color: #ffffff transparent transparent transparent;
-  filter: drop-shadow(0 2px 0 #ddd);
+  border-color: #5c4a32 transparent transparent transparent;
+}
+
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 5px 0 5px;
+  border-style: solid;
+  border-color: #fef9ef transparent transparent transparent;
+  z-index: 1;
 }
 
 /* ── 캐릭터 ── */
@@ -79,6 +98,7 @@ html, body, #root {
   height: 80px;
   object-fit: contain;
   user-select: none;
+  -webkit-user-drag: none;
   animation: float 2.5s ease-in-out infinite;
   transition: opacity 0.4s ease;
 }
@@ -87,19 +107,20 @@ html, body, #root {
 .hide { opacity: 0; }
 
 @keyframes float {
-  0%   { transform: translateY(0px); }
-  50%  { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
+  0%   { transform: translateY(0px) rotate(0deg); }
+  50%  { transform: translateY(-8px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
 
-/* ── 할일 패널 ── */
+/* ── 할일 패널 (로파이 스케치 스타일) ── */
 .todo-panel {
   width: 300px;
   flex: 1;
   min-height: 0;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  background: #fef9ef;
+  border: 2.5px solid #5c4a32;
+  border-radius: 18px 14px 16px 15px / 14px 18px 13px 16px;
+  box-shadow: 4px 5px 0px #c8b89a;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -123,30 +144,36 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px 10px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 16px 8px;
+  border-bottom: 2px dashed #c8b89a;
 }
 
 .todo-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #222;
+  font-size: 20px;
+  font-family: 'Nanum Pen Script', cursive;
+  color: #3d2f1e;
+  letter-spacing: 0.02em;
 }
 
 .close-btn {
   background: none;
-  border: none;
-  font-size: 14px;
-  color: #aaa;
+  border: 2px solid #c8b89a;
+  border-radius: 50%;
+  font-size: 13px;
+  color: #8a7260;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 6px;
-  line-height: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nanum Pen Script', cursive;
 }
 
 .close-btn:hover {
-  background: #f5f5f5;
-  color: #555;
+  background: #f0e8d8;
+  border-color: #5c4a32;
+  color: #3d2f1e;
 }
 
 /* 입력창 */
@@ -154,39 +181,48 @@ html, body, #root {
   display: flex;
   gap: 6px;
   padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px dashed #c8b89a;
 }
 
 .todo-input {
   flex: 1;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 13px;
+  border: 2px solid #c8b89a;
+  border-radius: 10px 8px 11px 9px / 9px 11px 8px 10px;
+  padding: 5px 10px;
+  font-size: 15px;
+  font-family: 'Nanum Pen Script', cursive;
   outline: none;
-  color: #333;
+  color: #3d2f1e;
+  background: #fff8e7;
 }
 
 .todo-input:focus {
-  border-color: #a0c4ff;
+  border-color: #5c4a32;
+  background: #fffdf5;
+}
+
+.todo-input::placeholder {
+  color: #c8b89a;
 }
 
 .add-btn {
-  background: #4f8ef7;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  width: 32px;
-  font-size: 20px;
+  background: #5c4a32;
+  color: #fef9ef;
+  border: 2px solid #5c4a32;
+  border-radius: 10px 8px 11px 9px;
+  width: 34px;
+  font-size: 22px;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Nanum Pen Script', cursive;
+  transition: background 0.15s;
 }
 
 .add-btn:hover {
-  background: #3a7de8;
+  background: #3d2f1e;
 }
 
 /* 목록 */
@@ -197,10 +233,19 @@ html, body, #root {
   padding: 6px 0;
 }
 
+.todo-list::-webkit-scrollbar {
+  width: 4px;
+}
+.todo-list::-webkit-scrollbar-thumb {
+  background: #c8b89a;
+  border-radius: 2px;
+}
+
 .todo-empty {
   text-align: center;
-  color: #bbb;
-  font-size: 13px;
+  color: #c8b89a;
+  font-size: 16px;
+  font-family: 'Nanum Pen Script', cursive;
   padding: 24px 0;
 }
 
@@ -208,40 +253,42 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: 8px;
   margin: 2px 8px;
   transition: background 0.15s;
 }
 
 .todo-item:hover {
-  background: #f9f9f9;
+  background: #f5eddc;
 }
 
 .todo-checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #4f8ef7;
+  accent-color: #5c4a32;
   flex-shrink: 0;
 }
 
 .todo-text {
   flex: 1;
-  font-size: 13px;
-  color: #333;
+  font-size: 16px;
+  font-family: 'Nanum Pen Script', cursive;
+  color: #3d2f1e;
+  line-height: 1.3;
 }
 
 .todo-item.done .todo-text {
   text-decoration: line-through;
-  color: #bbb;
+  color: #c8b89a;
 }
 
 .delete-btn {
   background: none;
   border: none;
-  font-size: 16px;
-  color: #ccc;
+  font-size: 18px;
+  color: #c8b89a;
   cursor: pointer;
   padding: 0 4px;
   line-height: 1;
@@ -249,15 +296,16 @@ html, body, #root {
 }
 
 .delete-btn:hover {
-  color: #f87171;
+  color: #a0522d;
 }
 
 /* 하단 */
 .todo-footer {
   padding: 8px 12px;
-  font-size: 12px;
-  color: #aaa;
-  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  font-family: 'Nanum Pen Script', cursive;
+  color: #8a7260;
+  border-top: 2px dashed #c8b89a;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -270,16 +318,18 @@ html, body, #root {
 
 .folder-btn {
   background: none;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-size: 11px;
-  color: #999;
+  border: 1.5px solid #c8b89a;
+  border-radius: 8px 7px 9px 8px;
+  padding: 2px 8px;
+  font-size: 13px;
+  font-family: 'Nanum Pen Script', cursive;
+  color: #8a7260;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .folder-btn:hover {
-  background: #f5f5f5;
-  color: #555;
+  background: #f0e8d8;
+  border-color: #5c4a32;
+  color: #3d2f1e;
 }
