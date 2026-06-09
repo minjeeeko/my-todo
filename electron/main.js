@@ -20,22 +20,29 @@ function saveSettings(data) {
 }
 
 // ── 저장 파일 내용 생성 ───────────────────────────────────────────────
-function buildFileContent(todos) {
+function buildFileContent(todos, retro) {
   const now    = new Date();
   const year   = now.getFullYear();
   const month  = String(now.getMonth() + 1).padStart(2, '0');
   const day    = String(now.getDate()).padStart(2, '0');
   const lines  = todos.map(t => `[${t.done ? 'v' : ' '}] ${t.text}`);
   const done   = todos.filter(t => t.done).length;
+
+  const parts = [
+    `=== ${year}년 ${month}월 ${day}일 할 일 기록 ===`,
+    '',
+    ...lines,
+    '',
+    `완료: ${done}개 / 전체: ${todos.length}개`,
+  ];
+
+  if (retro && retro.trim()) {
+    parts.push('', '─────────────────', '📝 오늘의 회고', '', retro.trim());
+  }
+
   return {
     fileName: `${year}-${month}-${day}.txt`,
-    content: [
-      `=== ${year}년 ${month}월 ${day}일 할 일 기록 ===`,
-      '',
-      ...lines,
-      '',
-      `완료: ${done}개 / 전체: ${todos.length}개`,
-    ].join('\n'),
+    content: parts.join('\n'),
   };
 }
 
@@ -129,11 +136,11 @@ function createWindow() {
     win.webContents.send('request-save');
   });
 
-  ipcMain.once('ready-to-close', (_, todos) => {
+  ipcMain.once('ready-to-close', (_, { todos, retro }) => {
     const settings = loadSettings();
-    if (settings.saveFolder && todos.length > 0) {
+    if (settings.saveFolder && (todos.length > 0 || retro)) {
       try {
-        const { fileName, content } = buildFileContent(todos);
+        const { fileName, content } = buildFileContent(todos, retro);
         fs.writeFileSync(path.join(settings.saveFolder, fileName), content, 'utf8');
       } catch (e) {
         console.error('저장 실패:', e);

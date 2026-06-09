@@ -312,18 +312,42 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .footer-count {
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.retro-btn {
+  background: #e02020;
+  color: #fff;
+  border: 1.5px solid #e02020;
+  border-radius: 8px 7px 9px 8px;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-family: 'OngleipKonkon', cursive;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.retro-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
 }
 
 .folder-btn {
   background: none;
   border: 1.5px solid #ddd;
   border-radius: 8px 7px 9px 8px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   font-size: 13px;
   font-family: 'OngleipKonkon', cursive;
   color: #888;
@@ -334,4 +358,61 @@ html, body, #root {
 .folder-btn:hover {
   border-color: #e02020;
   color: #e02020;
+}
+
+/* ── 회고 뷰 ── */
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-family: 'OngleipKonkon', cursive;
+  color: #888;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.back-btn:hover {
+  color: #111;
+}
+
+.retro-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 14px;
+  min-height: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 27px,
+    #f0eded 27px,
+    #f0eded 28px
+  );
+}
+
+.retro-date {
+  font-size: 15px;
+  font-family: 'OngleipKonkon', cursive;
+  color: #e02020;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid #eee;
+}
+
+.retro-textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 15px;
+  font-family: 'OngleipKonkon', cursive;
+  color: #111;
+  background: transparent;
+  line-height: 28px;
+  padding: 0;
+}
+
+.retro-textarea::placeholder {
+  color: #ccc;
+  line-height: 28px;
 }

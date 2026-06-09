@@ -16,6 +16,11 @@ function pickMessage(mood) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function todayLabel() {
+  const now = new Date();
+  return `${now.getFullYear()}년 ${String(now.getMonth() + 1).padStart(2, '0')}월 ${String(now.getDate()).padStart(2, '0')}일`;
+}
+
 const api = window.electronAPI;
 let nextId = 1;
 
@@ -26,10 +31,14 @@ export default function App() {
   const [expanded, setExpanded]         = useState(false);
   const [panelVisible, setPanelVisible] = useState(false);
   const [saveFolder, setSaveFolder]     = useState(null);
+  const [view, setView]                 = useState('todo'); // 'todo' | 'retro'
+  const [retro, setRetro]               = useState('');
 
-  const todosRef  = useRef(todos);
+  const todosRef = useRef(todos);
+  const retroRef = useRef(retro);
   const isDragging = useRef(false);
   useEffect(() => { todosRef.current = todos; }, [todos]);
+  useEffect(() => { retroRef.current = retro; }, [retro]);
 
   const total   = todos.length;
   const checked = todos.filter(t => t.done).length;
@@ -63,7 +72,9 @@ export default function App() {
   // ── 종료 시 저장 ────────────────────────────────────────────────────
   useEffect(() => {
     if (!api) return;
-    api.onRequestSave(() => api.readyToClose(todosRef.current));
+    api.onRequestSave(() =>
+      api.readyToClose({ todos: todosRef.current, retro: retroRef.current })
+    );
   }, []);
 
   // ── mouseup 전역: 드래그 종료 ───────────────────────────────────────
@@ -78,24 +89,21 @@ export default function App() {
     return () => window.removeEventListener('mouseup', onUp);
   }, []);
 
-  // ── 마스코트 드래그 시작 ─────────────────────────────────────────────
+  // ── 드래그 시작 ─────────────────────────────────────────────────────
   async function handleMascotMouseDown(e) {
     if (e.button !== 0 || !api) return;
     e.preventDefault();
-
-    const pos = await api.getWindowPosition(); // [x, y]
-    const offset = { x: e.screenX - pos[0], y: e.screenY - pos[1] };
+    const pos = await api.getWindowPosition();
     isDragging.current = true;
-    api.startDrag(offset);
+    api.startDrag({ x: e.screenX - pos[0], y: e.screenY - pos[1] });
   }
 
-  // mouseup이 드래그 후 click으로 이어지지 않도록: 드래그 여부로 open 차단
-  function handleMascotClick(e) {
+  function handleMascotClick() {
     if (isDragging.current) return;
     if (!expanded) open();
   }
 
-  // ── 창 크기 IPC ─────────────────────────────────────────────────────
+  // ── 창 크기 ─────────────────────────────────────────────────────────
   function resizeWindow(expand) {
     api?.setWindowSize(expand ? 320 : 200, expand ? 480 : 200);
   }
@@ -110,6 +118,7 @@ export default function App() {
     setPanelVisible(false);
     setTimeout(() => {
       setExpanded(false);
+      setView('todo');
       resizeWindow(false);
     }, 300);
   }
@@ -143,45 +152,72 @@ export default function App() {
 
       {expanded && (
         <div className={`todo-panel ${panelVisible ? 'panel-show' : 'panel-hide'}`}>
-          <div className="todo-header">
-            <span className="todo-title">나의 할 일</span>
-            <button className="close-btn" onClick={close}>✕</button>
-          </div>
 
-          <div className="todo-input-row">
-            <input
-              className="todo-input"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && addTodo()}
-              placeholder="할 일을 입력하세요"
-              autoFocus
-            />
-            <button className="add-btn" onClick={addTodo}>+</button>
-          </div>
+          {/* ── Todo 뷰 ── */}
+          {view === 'todo' && <>
+            <div className="todo-header">
+              <span className="todo-title">나의 할 일</span>
+              <button className="close-btn" onClick={close}>✕</button>
+            </div>
 
-          <ul className="todo-list">
-            {todos.length === 0 && (
-              <li className="todo-empty">할 일을 추가해보세요!</li>
-            )}
-            {todos.map(t => (
-              <li key={t.id} className={`todo-item ${t.done ? 'done' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={() => toggleTodo(t.id)}
-                  className="todo-checkbox"
-                />
-                <span className="todo-text">{t.text}</span>
-                <button className="delete-btn" onClick={() => deleteTodo(t.id)}>×</button>
-              </li>
-            ))}
-          </ul>
+            <div className="todo-input-row">
+              <input
+                className="todo-input"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && addTodo()}
+                placeholder="할 일을 입력하세요"
+                autoFocus
+              />
+              <button className="add-btn" onClick={addTodo}>+</button>
+            </div>
 
-          <div className="todo-footer">
-            <span className="footer-count">완료 {checked}개 / 전체 {total}개</span>
-            <button className="folder-btn" onClick={changeFolder}>저장 폴더 변경</button>
-          </div>
+            <ul className="todo-list">
+              {todos.length === 0 && (
+                <li className="todo-empty">할 일을 추가해보세요!</li>
+              )}
+              {todos.map(t => (
+                <li key={t.id} className={`todo-item ${t.done ? 'done' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() => toggleTodo(t.id)}
+                    className="todo-checkbox"
+                  />
+                  <span className="todo-text">{t.text}</span>
+                  <button className="delete-btn" onClick={() => deleteTodo(t.id)}>×</button>
+                </li>
+              ))}
+            </ul>
+
+            <div className="todo-footer">
+              <span className="footer-count">완료 {checked}개 / 전체 {total}개</span>
+              <div className="footer-actions">
+                <button className="retro-btn" onClick={() => setView('retro')}>오늘 회고</button>
+                <button className="folder-btn" onClick={changeFolder}>폴더 변경</button>
+              </div>
+            </div>
+          </>}
+
+          {/* ── 회고 뷰 ── */}
+          {view === 'retro' && <>
+            <div className="todo-header">
+              <button className="back-btn" onClick={() => setView('todo')}>← 할 일</button>
+              <button className="close-btn" onClick={close}>✕</button>
+            </div>
+
+            <div className="retro-panel">
+              <div className="retro-date">{todayLabel()} 회고</div>
+              <textarea
+                className="retro-textarea"
+                value={retro}
+                onChange={e => setRetro(e.target.value)}
+                placeholder={"오늘 하루 어땠나요?\n잘 한 것, 아쉬운 것, 내일 할 것들을 자유롭게 적어보세요 ✏️"}
+                autoFocus
+              />
+            </div>
+          </>}
+
         </div>
       )}
 
