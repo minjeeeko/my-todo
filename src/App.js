@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import messages from './messages';
-
-const MOODS = ['normal', 'happy', 'sleepy', 'excited', 'sad'];
+import { useMascotState } from './useMascotState';
 
 const CHARACTER = {
   normal:  'assets/character_normal.png',
@@ -12,59 +11,50 @@ const CHARACTER = {
   sad:     'assets/character_sad.png',
 };
 
-// 30초~2분 사이 랜덤 ms
-function randomInterval() {
-  return (30 + Math.random() * 90) * 1000;
-}
-
-// 현재 시각이 밤 10시~오전 7시인지
-function isNightTime() {
-  const h = new Date().getHours();
-  return h >= 22 || h < 7;
-}
-
-// 시간대 가중치를 반영한 다음 상태 선택
-function pickNextMood(current) {
-  const pool = isNightTime()
-    ? [...MOODS, 'sleepy', 'sleepy', 'sleepy'] // sleepy 가중치 4배
-    : MOODS;
-
-  let next;
-  do {
-    next = pool[Math.floor(Math.random() * pool.length)];
-  } while (next === current);
-  return next;
-}
-
 function pickMessage(mood) {
   const list = messages[mood];
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function App() {
-  const [mood, setMood] = useState('normal');
-  const [message, setMessage] = useState(pickMessage('normal'));
-  const [visible, setVisible] = useState(true); // fade 제어
-  const timerRef = useRef(null);
+// 임시 todo 데이터 (나중에 실제 todo 연동으로 교체)
+const INITIAL_TODOS = [
+  { id: 1, text: '할 일 1', done: false },
+  { id: 2, text: '할 일 2', done: false },
+  { id: 3, text: '할 일 3', done: false },
+];
+
+export default function App() {
+  const [todos, setTodos] = useState(INITIAL_TODOS);
+  const [lastChecked, setLastChecked] = useState(null);
+
+  const total   = todos.length;
+  const checked = todos.filter(t => t.done).length;
+
+  const { mood } = useMascotState({ total, checked, lastChecked });
+
+  // mood 변경 시 fade + 메시지 갱신
+  const [message, setMessage]   = useState(pickMessage('normal'));
+  const [visible, setVisible]   = useState(true);
+  const prevMoodRef              = useRef('normal');
 
   useEffect(() => {
-    function schedule() {
-      timerRef.current = setTimeout(() => {
-        const next = pickNextMood(mood);
-        // fade out → 상태 전환 → fade in
-        setVisible(false);
-        setTimeout(() => {
-          setMood(next);
-          setMessage(pickMessage(next));
-          setVisible(true);
-          schedule();
-        }, 400);
-      }, randomInterval());
-    }
+    if (mood === prevMoodRef.current) return;
+    prevMoodRef.current = mood;
 
-    schedule();
-    return () => clearTimeout(timerRef.current);
+    setVisible(false);
+    const id = setTimeout(() => {
+      setMessage(pickMessage(mood));
+      setVisible(true);
+    }, 400);
+    return () => clearTimeout(id);
   }, [mood]);
+
+  function toggleTodo(id) {
+    setTodos(prev =>
+      prev.map(t => t.id === id ? { ...t, done: !t.done } : t)
+    );
+    setLastChecked(Date.now());
+  }
 
   return (
     <div className="mascot">
@@ -79,5 +69,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
