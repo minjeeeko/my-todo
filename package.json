@@ -8,7 +8,7 @@
     "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
-    "build": "npm run react-build && electron-builder"
+    "build": "rimraf dist && npm run react-build && electron-builder"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -19,11 +19,18 @@
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
     "react-scripts": "5.0.1",
+    "rimraf": "^5.0.10",
     "wait-on": "^7.2.0"
   },
   "browserslist": {
-    "production": [">0.2%", "not dead", "not op_mini all"],
-    "development": ["last 1 chrome version"]
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version"
+    ]
   },
   "build": {
     "appId": "com.halilmandu.app",
@@ -42,7 +49,9 @@
       {
         "from": "public/assets",
         "to": "assets",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "directories": {
@@ -50,26 +59,48 @@
     },
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["x64", "arm64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "category": "public.app-category.productivity"
     },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "installerLanguages": ["ko_KR", "en_US"],
+      "installerLanguages": [
+        "ko_KR",
+        "en_US"
+      ],
       "language": "1042"
     },
     "dmg": {
       "title": "할일만두",
       "contents": [
-        { "x": 130, "y": 220 },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
     }
   }
