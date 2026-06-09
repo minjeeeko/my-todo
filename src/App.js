@@ -45,19 +45,25 @@ export default function App() {
 
   const { mood } = useMascotState({ total, checked, lastChecked });
 
-  const [message, setMessage] = useState(pickMessage('normal'));
-  const [visible, setVisible] = useState(true);
+  const [message, setMessage]         = useState(pickMessage('normal'));
+  const [bubbleVisible, setBubbleVisible] = useState(true);
+  const [displayMood, setDisplayMood]   = useState('normal'); // 실제 표시 이미지
   const prevMoodRef = useRef('normal');
 
   useEffect(() => {
     if (mood === prevMoodRef.current) return;
     prevMoodRef.current = mood;
-    setVisible(false);
+    // 말풍선만 잠깐 숨기고 메시지·이미지 교체 후 다시 표시
+    setBubbleVisible(false);
     const id = setTimeout(() => {
       setMessage(pickMessage(mood));
-      setVisible(true);
-    }, 400);
-    return () => clearTimeout(id);
+      setDisplayMood(mood);
+      setBubbleVisible(true);
+    }, 350);
+    return () => {
+      clearTimeout(id);
+      setBubbleVisible(true); // 타이밍 겹쳐도 말풍선은 복구
+    };
   }, [mood]);
 
   // ── 최초 실행: 저장 폴더 확인 ──────────────────────────────────────
@@ -232,10 +238,10 @@ export default function App() {
         onMouseDown={handleMascotMouseDown}
         onClick={handleMascotClick}
       >
-        <div className={`speech-bubble ${visible ? 'show' : 'hide'}`}>{message}</div>
+        <div className={`speech-bubble ${bubbleVisible ? 'show' : 'hide'}`}>{message}</div>
         <img
-          className={`mascot-character ${visible ? 'show' : 'hide'}`}
-          src={CHARACTER[mood]}
+          className="mascot-character"
+          src={CHARACTER[displayMood]}
           alt="mascot"
           draggable="false"
         />
