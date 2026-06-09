@@ -16,21 +16,26 @@ function pickMessage(mood) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+const api = window.electronAPI;
 let nextId = 1;
 
 export default function App() {
-  const [todos, setTodos]           = useState([]);
-  const [input, setInput]           = useState('');
-  const [lastChecked, setLastChecked] = useState(null);
-  const [expanded, setExpanded]     = useState(false);
-  const [panelVisible, setPanelVisible] = useState(false); // 패널 fade 제어
+  const [todos, setTodos]               = useState([]);
+  const [input, setInput]               = useState('');
+  const [lastChecked, setLastChecked]   = useState(null);
+  const [expanded, setExpanded]         = useState(false);
+  const [panelVisible, setPanelVisible] = useState(false);
+  const [saveFolder, setSaveFolder]     = useState(null);
+
+  // todos ref: 종료 시 최신값 전달용
+  const todosRef = useRef(todos);
+  useEffect(() => { todosRef.current = todos; }, [todos]);
 
   const total   = todos.length;
   const checked = todos.filter(t => t.done).length;
 
   const { mood } = useMascotState({ total, checked, lastChecked });
 
-  // mood 변경 시 캐릭터/말풍선 fade 전환
   const [message, setMessage] = useState(pickMessage('normal'));
   const [visible, setVisible] = useState(true);
   const prevMoodRef = useRef('normal');
@@ -46,14 +51,32 @@ export default function App() {
     return () => clearTimeout(id);
   }, [mood]);
 
-  // 창 크기 조절 (IPC)
+  // ── 최초 실행: 저장 폴더 확인 ──────────────────────────────────────
+  useEffect(() => {
+    if (!api) return;
+    api.getSaveFolder().then(folder => {
+      if (folder) {
+        setSaveFolder(folder);
+      } else {
+        // 폴더 미설정 → 다이얼로그 표시
+        api.selectFolder().then(selected => {
+          if (selected) setSaveFolder(selected);
+        });
+      }
+    });
+  }, []);
+
+  // ── 종료 시 저장 ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!api) return;
+    api.onRequestSave(() => {
+      api.readyToClose(todosRef.current);
+    });
+  }, []);
+
+  // ── 창 크기 IPC ─────────────────────────────────────────────────────
   function resizeWindow(expand) {
-    if (window.electronAPI) {
-      window.electronAPI.setWindowSize(
-        expand ? 320 : 200,
-        expand ? 480 : 200
-      );
-    }
+    api?.setWindowSize(expand ? 320 : 200, expand ? 480 : 200);
   }
 
   function open() {
@@ -70,7 +93,14 @@ export default function App() {
     }, 300);
   }
 
-  // 할일 추가
+  // ── 저장 폴더 변경 ──────────────────────────────────────────────────
+  async function changeFolder() {
+    if (!api) return;
+    const selected = await api.selectFolder();
+    if (selected) setSaveFolder(selected);
+  }
+
+  // ── Todo CRUD ───────────────────────────────────────────────────────
   function addTodo() {
     const text = input.trim();
     if (!text) return;
@@ -78,23 +108,19 @@ export default function App() {
     setInput('');
   }
 
-  // 체크 토글
   function toggleTodo(id) {
-    setTodos(prev =>
-      prev.map(t => t.id === id ? { ...t, done: !t.done } : t)
-    );
+    setTodos(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
     setLastChecked(Date.now());
   }
 
-  // 삭제
   function deleteTodo(id) {
     setTodos(prev => prev.filter(t => t.id !== id));
   }
 
+  // ── 렌더 ────────────────────────────────────────────────────────────
   return (
     <div className={`app-root ${expanded ? 'expanded' : ''}`}>
 
-      {/* 할일 패널 (확장 시) */}
       {expanded && (
         <div className={`todo-panel ${panelVisible ? 'panel-show' : 'panel-hide'}`}>
           <div className="todo-header">
@@ -133,16 +159,16 @@ export default function App() {
           </ul>
 
           <div className="todo-footer">
-            완료 {checked}개 / 전체 {total}개
+            <span className="footer-count">완료 {checked}개 / 전체 {total}개</span>
+            <button className="folder-btn" onClick={changeFolder}>
+              저장 폴더 변경
+            </button>
           </div>
         </div>
       )}
 
-      {/* 마스코트 영역 */}
       <div className="mascot" onClick={!expanded ? open : undefined}>
-        <div className={`speech-bubble ${visible ? 'show' : 'hide'}`}>
-          {message}
-        </div>
+        <div className={`speech-bubble ${visible ? 'show' : 'hide'}`}>{message}</div>
         <img
           className={`mascot-character ${visible ? 'show' : 'hide'}`}
           src={CHARACTER[mood]}
