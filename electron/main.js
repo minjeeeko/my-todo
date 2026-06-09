@@ -1,12 +1,21 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   const win = new BrowserWindow({
-    width: 900,
-    height: 680,
+    width: 200,
+    height: 200,
+    x: width - 220,
+    y: height - 220,
+    alwaysOnTop: true,
+    frame: false,
+    transparent: true,
+    skipTaskbar: true,
+    resizable: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
