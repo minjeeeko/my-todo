@@ -1,7 +1,7 @@
 {
-  "name": "my-todo",
+  "name": "halilmandu",
   "version": "1.0.0",
-  "description": "Todo app built with Electron + React",
+  "description": "할일만두 - 데스크톱 마스코트 할일 앱",
   "main": "electron/main.js",
   "scripts": {
     "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
@@ -25,11 +25,47 @@
     "development": ["last 1 chrome version"]
   },
   "build": {
-    "appId": "com.mytodo.app",
-    "productName": "My Todo",
+    "appId": "com.halilmandu.app",
+    "productName": "할일만두",
+    "copyright": "Copyright © 2026 할일만두",
     "files": [
       "build/**/*",
-      "electron/**/*"
-    ]
+      "electron/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "public/assets",
+        "to": "assets",
+        "filter": ["**/*"]
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": ["ko_KR", "en_US"],
+      "language": "1042"
+    },
+    "dmg": {
+      "title": "할일만두",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    }
   }
 }
