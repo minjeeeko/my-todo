@@ -1,82 +1,77 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 /**
- * 마스코트 상태 머신
+ * baseMood : todo 조건 기반 지속 상태 (normal / excited / sad)
+ * tempMood : 일시 상태 (happy / sleepy), 우선순위 높음
  *
- * baseMood  : todo 조건으로 결정되는 지속 상태 (normal / excited / sad)
- * tempMood  : 일시적으로 덮어쓰는 상태 (happy / sleepy)
- * 표시 우선순위: tempMood > baseMood
- *
- * @param {object} params
- * @param {number} params.total       - 전체 todo 수
- * @param {number} params.checked     - 완료된 todo 수
- * @param {number} params.lastChecked - 마지막으로 체크한 timestamp (ms), 없으면 null
- * @returns {{ mood: string, triggerCheck: () => void }}
+ * 상태 규칙:
+ * - excited : 전체 완료 (total > 0 && undone === 0)
+ * - sad(base): 미완료 5개 이상
+ * - sad(temp): 1시간 이상 체크 없음 → 1분간
+ * - happy    : todo 체크 시 → 5초간
+ * - sleepy   : 오후 2·3·4시 정각 → 3분간
+ * - normal   : 그 외
  */
 export function useMascotState({ total, checked, lastChecked }) {
+  const undone = total - checked;
+
   const [baseMood, setBaseMood] = useState('normal');
   const [tempMood, setTempMood] = useState(null);
-  const tempTimerRef = useRef(null);
+  const tempTimerRef  = useRef(null);
   const prevCheckedRef = useRef(checked);
-  const prevHourRef = useRef(new Date().getHours());
+  const prevHourRef   = useRef(new Date().getHours());
 
-  // 일시 상태 설정 (durationMs 후 자동 해제)
   const setTemp = useCallback((mood, durationMs) => {
     clearTimeout(tempTimerRef.current);
     setTempMood(mood);
     tempTimerRef.current = setTimeout(() => setTempMood(null), durationMs);
   }, []);
 
-  // todo 체크 수 변화 감지 → happy / excited
+  // baseMood: 미완료 수에 따라 결정
+  useEffect(() => {
+    if (total > 0 && undone === 0) {
+      setBaseMood('excited');
+    } else if (undone >= 5) {
+      setBaseMood('sad');
+    } else {
+      setBaseMood('normal');
+    }
+  }, [total, undone]);
+
+  // happy: todo 새로 체크할 때 (전부 완료 시엔 excited로 처리되므로 제외)
   useEffect(() => {
     const prev = prevCheckedRef.current;
     prevCheckedRef.current = checked;
 
-    if (checked === prev) return;
-
-    if (total > 0 && checked === total) {
-      // 전부 완료 → excited (지속)
-      clearTimeout(tempTimerRef.current);
-      setTempMood(null);
-      setBaseMood('excited');
-    } else if (checked > prev) {
-      // 하나 체크 → happy 5초
+    if (checked > prev && undone > 0) {
       setTemp('happy', 5000);
-      setBaseMood('normal');
-    } else {
-      // 체크 해제 → excited 해제
-      setBaseMood('normal');
     }
-  }, [checked, total, setTemp]);
+  }, [checked, undone, setTemp]);
 
-  // sad: 1시간 이상 체크 없음 (todo가 남아 있을 때)
+  // sad(temp): 1시간 이상 체크 없음
   useEffect(() => {
-    if (total === 0 || checked === total) return;
+    if (total === 0 || undone === 0) return;
 
     const check = () => {
       if (lastChecked === null) return;
-      const elapsed = Date.now() - lastChecked;
-      if (elapsed >= 60 * 60 * 1000) {
-        setTemp('sad', 60 * 1000); // sad 1분 표시
+      if (Date.now() - lastChecked >= 60 * 60 * 1000) {
+        setTemp('sad', 60 * 1000);
       }
     };
 
     check();
     const id = setInterval(check, 60 * 1000);
     return () => clearInterval(id);
-  }, [lastChecked, total, checked, setTemp]);
+  }, [lastChecked, total, undone, setTemp]);
 
-  // sleepy: 매 분마다 시각 체크 → 14시·15시·16시 정각에 3분간
+  // sleepy: 오후 2·3·4시 정각
   useEffect(() => {
     const check = () => {
-      const now = new Date();
-      const h = now.getHours();
-      const m = now.getMinutes();
-      const prevH = prevHourRef.current;
-
-      if ([14, 15, 16].includes(h) && m === 0 && h !== prevH) {
+      const h = new Date().getHours();
+      const m = new Date().getMinutes();
+      if ([14, 15, 16].includes(h) && m === 0 && h !== prevHourRef.current) {
         prevHourRef.current = h;
-        setTemp('sleepy', 3 * 60 * 1000); // sleepy 3분
+        setTemp('sleepy', 3 * 60 * 1000);
       }
     };
 
@@ -84,7 +79,5 @@ export function useMascotState({ total, checked, lastChecked }) {
     return () => clearInterval(id);
   }, [setTemp]);
 
-  return {
-    mood: tempMood ?? baseMood,
-  };
+  return { mood: tempMood ?? baseMood };
 }
