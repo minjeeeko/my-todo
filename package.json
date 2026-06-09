@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "할일만두 - 데스크톱 마스코트 할일 앱",
   "main": "electron/main.js",
+  "homepage": "./",
   "scripts": {
     "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
     "react-start": "react-scripts start",
@@ -28,10 +29,13 @@
     "appId": "com.halilmandu.app",
     "productName": "할일만두",
     "copyright": "Copyright © 2026 할일만두",
+    "asar": true,
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
     "files": [
       "build/**/*",
-      "electron/**/*",
-      "node_modules/**/*"
+      "electron/**/*"
     ],
     "extraResources": [
       {
