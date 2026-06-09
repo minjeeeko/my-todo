@@ -70,7 +70,7 @@ html, body, #root {
   white-space: nowrap;
   margin-bottom: 6px;
   transition: opacity 0.4s ease;
-  box-shadow: 2px 3px 0px #e02020;
+  box-shadow: none;
   transform: rotate(-1deg);
 }
 
@@ -125,7 +125,7 @@ html, body, #root {
   background: #ffffff;
   border: 2.5px solid #111;
   border-radius: 18px 14px 16px 15px / 14px 18px 13px 16px;
-  box-shadow: 4px 5px 0px #e02020;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -156,7 +156,7 @@ html, body, #root {
 .todo-title {
   font-size: 20px;
   font-family: 'OngleipKonkon', cursive;
-  color: #e02020;
+  color: #111;
   letter-spacing: 0.02em;
 }
 
