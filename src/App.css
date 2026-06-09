@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@font-face {
+  font-family: 'OngleipKonkon';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2412-1@1.0/Ownglyph_corncorn-Rg.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
 
 * {
   margin: 0;
@@ -11,7 +16,7 @@ html, body, #root {
   height: 100vh;
   background: transparent;
   overflow: hidden;
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: 'OngleipKonkon', cursive;
 }
 
 /* ── 루트 컨테이너 ── */
@@ -52,20 +57,20 @@ html, body, #root {
   cursor: default;
 }
 
-/* ── 말풍선 (로파이 스케치 스타일) ── */
+/* ── 말풍선 ── */
 .speech-bubble {
   position: relative;
-  background: #fef9ef;
-  border: 2.5px solid #5c4a32;
+  background: #ffffff;
+  border: 2.5px solid #111;
   border-radius: 14px 16px 12px 15px / 12px 14px 16px 13px;
   padding: 6px 13px;
   font-size: 15px;
-  font-family: 'Nanum Pen Script', cursive;
-  color: #3d2f1e;
+  font-family: 'OngleipKonkon', cursive;
+  color: #111;
   white-space: nowrap;
   margin-bottom: 6px;
   transition: opacity 0.4s ease;
-  box-shadow: 2px 3px 0px #c8b89a;
+  box-shadow: 2px 3px 0px #e02020;
   transform: rotate(-1deg);
 }
 
@@ -77,18 +82,18 @@ html, body, #root {
   transform: translateX(-50%);
   border-width: 9px 6px 0 6px;
   border-style: solid;
-  border-color: #5c4a32 transparent transparent transparent;
+  border-color: #111 transparent transparent transparent;
 }
 
 .speech-bubble::before {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: -7px;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 8px 5px 0 5px;
+  border-width: 7px 5px 0 5px;
   border-style: solid;
-  border-color: #fef9ef transparent transparent transparent;
+  border-color: #ffffff transparent transparent transparent;
   z-index: 1;
 }
 
@@ -112,15 +117,15 @@ html, body, #root {
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
-/* ── 할일 패널 (로파이 스케치 스타일) ── */
+/* ── 할일 패널 ── */
 .todo-panel {
   width: 300px;
   flex: 1;
   min-height: 0;
-  background: #fef9ef;
-  border: 2.5px solid #5c4a32;
+  background: #ffffff;
+  border: 2.5px solid #111;
   border-radius: 18px 14px 16px 15px / 14px 18px 13px 16px;
-  box-shadow: 4px 5px 0px #c8b89a;
+  box-shadow: 4px 5px 0px #e02020;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -145,35 +150,33 @@ html, body, #root {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px 8px;
-  border-bottom: 2px dashed #c8b89a;
+  border-bottom: 2px dashed #ddd;
 }
 
 .todo-title {
   font-size: 20px;
-  font-family: 'Nanum Pen Script', cursive;
-  color: #3d2f1e;
+  font-family: 'OngleipKonkon', cursive;
+  color: #e02020;
   letter-spacing: 0.02em;
 }
 
 .close-btn {
   background: none;
-  border: 2px solid #c8b89a;
+  border: 2px solid #ddd;
   border-radius: 50%;
-  font-size: 13px;
-  color: #8a7260;
+  font-size: 12px;
+  color: #888;
   cursor: pointer;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Nanum Pen Script', cursive;
 }
 
 .close-btn:hover {
-  background: #f0e8d8;
-  border-color: #5c4a32;
-  color: #3d2f1e;
+  border-color: #e02020;
+  color: #e02020;
 }
 
 /* 입력창 */
@@ -181,34 +184,33 @@ html, body, #root {
   display: flex;
   gap: 6px;
   padding: 10px 12px;
-  border-bottom: 2px dashed #c8b89a;
+  border-bottom: 2px dashed #ddd;
 }
 
 .todo-input {
   flex: 1;
-  border: 2px solid #c8b89a;
+  border: 2px solid #ddd;
   border-radius: 10px 8px 11px 9px / 9px 11px 8px 10px;
   padding: 5px 10px;
   font-size: 15px;
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: 'OngleipKonkon', cursive;
   outline: none;
-  color: #3d2f1e;
-  background: #fff8e7;
+  color: #111;
+  background: #fff;
 }
 
 .todo-input:focus {
-  border-color: #5c4a32;
-  background: #fffdf5;
+  border-color: #e02020;
 }
 
 .todo-input::placeholder {
-  color: #c8b89a;
+  color: #bbb;
 }
 
 .add-btn {
-  background: #5c4a32;
-  color: #fef9ef;
-  border: 2px solid #5c4a32;
+  background: #e02020;
+  color: #fff;
+  border: 2px solid #e02020;
   border-radius: 10px 8px 11px 9px;
   width: 34px;
   font-size: 22px;
@@ -217,12 +219,13 @@ html, body, #root {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: 'OngleipKonkon', cursive;
   transition: background 0.15s;
 }
 
 .add-btn:hover {
-  background: #3d2f1e;
+  background: #b91c1c;
+  border-color: #b91c1c;
 }
 
 /* 목록 */
@@ -237,15 +240,15 @@ html, body, #root {
   width: 4px;
 }
 .todo-list::-webkit-scrollbar-thumb {
-  background: #c8b89a;
+  background: #e02020;
   border-radius: 2px;
 }
 
 .todo-empty {
   text-align: center;
-  color: #c8b89a;
+  color: #bbb;
   font-size: 16px;
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: 'OngleipKonkon', cursive;
   padding: 24px 0;
 }
 
@@ -260,35 +263,35 @@ html, body, #root {
 }
 
 .todo-item:hover {
-  background: #f5eddc;
+  background: #fff5f5;
 }
 
 .todo-checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #5c4a32;
+  accent-color: #e02020;
   flex-shrink: 0;
 }
 
 .todo-text {
   flex: 1;
   font-size: 16px;
-  font-family: 'Nanum Pen Script', cursive;
-  color: #3d2f1e;
+  font-family: 'OngleipKonkon', cursive;
+  color: #111;
   line-height: 1.3;
 }
 
 .todo-item.done .todo-text {
   text-decoration: line-through;
-  color: #c8b89a;
+  color: #bbb;
 }
 
 .delete-btn {
   background: none;
   border: none;
   font-size: 18px;
-  color: #c8b89a;
+  color: #ddd;
   cursor: pointer;
   padding: 0 4px;
   line-height: 1;
@@ -296,16 +299,16 @@ html, body, #root {
 }
 
 .delete-btn:hover {
-  color: #a0522d;
+  color: #e02020;
 }
 
 /* 하단 */
 .todo-footer {
   padding: 8px 12px;
   font-size: 14px;
-  font-family: 'Nanum Pen Script', cursive;
-  color: #8a7260;
-  border-top: 2px dashed #c8b89a;
+  font-family: 'OngleipKonkon', cursive;
+  color: #888;
+  border-top: 2px dashed #ddd;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -318,18 +321,17 @@ html, body, #root {
 
 .folder-btn {
   background: none;
-  border: 1.5px solid #c8b89a;
+  border: 1.5px solid #ddd;
   border-radius: 8px 7px 9px 8px;
   padding: 2px 8px;
   font-size: 13px;
-  font-family: 'Nanum Pen Script', cursive;
-  color: #8a7260;
+  font-family: 'OngleipKonkon', cursive;
+  color: #888;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .folder-btn:hover {
-  background: #f0e8d8;
-  border-color: #5c4a32;
-  color: #3d2f1e;
+  border-color: #e02020;
+  color: #e02020;
 }
