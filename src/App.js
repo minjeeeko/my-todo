@@ -3,12 +3,15 @@ import './App.css';
 import messages from './messages';
 import { useMascotState } from './useMascotState';
 
+// 개발: localhost 상대경로 / 빌드: asset:// 커스텀 프로토콜
+const BASE = window.location.hostname === 'localhost' ? '' : 'asset://';
+
 const CHARACTER = {
-  normal:  'assets/character_normal.png',
-  happy:   'assets/character_happy.png',
-  sleepy:  'assets/character_sleepy.png',
-  excited: 'assets/character_excited.png',
-  sad:     'assets/character_sad.png',
+  normal:  `${BASE}assets/character_normal.png`,
+  happy:   `${BASE}assets/character_happy.png`,
+  sleepy:  `${BASE}assets/character_sleepy.png`,
+  excited: `${BASE}assets/character_excited.png`,
+  sad:     `${BASE}assets/character_sad.png`,
 };
 
 function pickMessage(mood) {

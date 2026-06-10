@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, dialog, protocol } = require('electron');
 const path = require('path');
 const fs   = require('fs');
 
@@ -70,6 +70,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false, // asset:// 프로토콜 이미지 로드 허용
     },
   });
 
@@ -150,7 +151,18 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // asset:// 프로토콜: 개발 시 public/assets, 빌드 후 resources/assets 서빙
+  protocol.registerFileProtocol('asset', (request, callback) => {
+    const relative = decodeURIComponent(request.url.replace('asset://', ''));
+    const base = isDev
+      ? path.join(__dirname, '../public')
+      : process.resourcesPath;
+    callback({ path: path.join(base, relative) });
+  });
+
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
