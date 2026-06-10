@@ -2,7 +2,7 @@ const { app, BrowserWindow, screen, ipcMain, dialog, protocol } = require('elect
 const path = require('path');
 const fs   = require('fs');
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = !app.isPackaged;
 
 // Electron 20+: must register custom schemes before app.whenReady()
 protocol.registerSchemesAsPrivileged([
