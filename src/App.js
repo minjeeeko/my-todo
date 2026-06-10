@@ -3,7 +3,6 @@ import './App.css';
 import messages from './messages';
 import { useMascotState } from './useMascotState';
 
-// 개발: localhost 상대경로 / 빌드: asset:// 커스텀 프로토콜
 const BASE = window.location.hostname === 'localhost' ? '' : 'asset://';
 
 const CHARACTER = {
@@ -13,6 +12,13 @@ const CHARACTER = {
   excited: `${BASE}assets/character_excited.png`,
   sad:     `${BASE}assets/character_sad.png`,
 };
+
+const SIZE_OPTIONS = [
+  { label: '소', value: 60 },
+  { label: '중', value: 80 },
+  { label: '대', value: 100 },
+  { label: '특대', value: 120 },
+];
 
 function pickMessage(mood) {
   const list = messages[mood];
@@ -41,14 +47,21 @@ export default function App() {
   const [lastChecked, setLastChecked]   = useState(null);
   const [expanded, setExpanded]         = useState(false);
   const [panelVisible, setPanelVisible] = useState(false);
+  const [panelBelow, setPanelBelow]     = useState(false);
   const [saveFolder, setSaveFolder]     = useState(null);
-  const [view, setView]                 = useState('todo'); // 'todo' | 'retro'
+  const [view, setView]                 = useState('todo');
   const [retro, setRetro]               = useState('');
   const [keyColor, setKeyColor]         = useState('#38bdf8');
+  const [charSize, setCharSize]         = useState(() => {
+    const saved = localStorage.getItem('charSize');
+    return saved ? Number(saved) : 80;
+  });
+  const [contextMenu, setContextMenu]   = useState(null); // {x, y}
 
-  const todosRef = useRef(todos);
-  const retroRef = useRef(retro);
+  const todosRef    = useRef(todos);
+  const retroRef    = useRef(retro);
   const dragStarted = useRef(false);
+  const expandDir   = useRef('up');
   useEffect(() => { todosRef.current = todos; }, [todos]);
   useEffect(() => { retroRef.current = retro; }, [retro]);
 
@@ -57,35 +70,30 @@ export default function App() {
 
   const { mood } = useMascotState({ total, checked, lastChecked });
 
-  const [message, setMessage]         = useState(pickMessage('normal'));
+  const [message, setMessage]           = useState(pickMessage('normal'));
   const [bubbleVisible, setBubbleVisible] = useState(true);
-  const [displayMood, setDisplayMood]   = useState('normal'); // 실제 표시 이미지
+  const [displayMood, setDisplayMood]   = useState('normal');
   const prevMoodRef = useRef('normal');
 
   useEffect(() => {
     if (mood === prevMoodRef.current) return;
     prevMoodRef.current = mood;
-    // 말풍선만 잠깐 숨기고 메시지·이미지 교체 후 다시 표시
     setBubbleVisible(false);
     const id = setTimeout(() => {
       setMessage(pickMessage(mood));
       setDisplayMood(mood);
       setBubbleVisible(true);
     }, 350);
-    return () => {
-      clearTimeout(id);
-      setBubbleVisible(true); // 타이밍 겹쳐도 말풍선은 복구
-    };
+    return () => { clearTimeout(id); setBubbleVisible(true); };
   }, [mood]);
 
-  // ── CSS 변수로 키컬러 적용 ──────────────────────────────────────────
+  // ── CSS 변수로 키컬러 적용 ────────────────────────────────────────────
   useEffect(() => {
-    const dark = adjustColor(keyColor, -30);
     document.documentElement.style.setProperty('--key-color', keyColor);
-    document.documentElement.style.setProperty('--key-color-dark', dark);
+    document.documentElement.style.setProperty('--key-color-dark', adjustColor(keyColor, -30));
   }, [keyColor]);
 
-  // ── 최초 실행: 저장 폴더 + 키컬러 로드 ────────────────────────────
+  // ── 최초 실행: 저장 폴더 + 키컬러 로드 ──────────────────────────────
   useEffect(() => {
     if (!api) return;
     api.getSaveFolder().then(folder => {
@@ -95,7 +103,7 @@ export default function App() {
     api.getKeyColor().then(color => { if (color) setKeyColor(color); });
   }, []);
 
-  // ── 종료 시 저장 ────────────────────────────────────────────────────
+  // ── 종료 / 자동저장 IPC ──────────────────────────────────────────────
   useEffect(() => {
     if (!api) return;
     api.onRequestSave(() =>
@@ -110,7 +118,14 @@ export default function App() {
     });
   }, []);
 
-  // ── mouseup 전역: 드래그 종료 ───────────────────────────────────────
+  // ── 컨텍스트 메뉴 닫기 (외부 클릭) ─────────────────────────────────
+  useEffect(() => {
+    const onDown = () => setContextMenu(null);
+    window.addEventListener('mousedown', onDown);
+    return () => window.removeEventListener('mousedown', onDown);
+  }, []);
+
+  // ── mouseup 전역: 드래그 종료 ────────────────────────────────────────
   useEffect(() => {
     const onUp = () => {
       if (dragStarted.current) {
@@ -122,26 +137,44 @@ export default function App() {
     return () => window.removeEventListener('mouseup', onUp);
   }, []);
 
-  // ── 드래그 시작: clientX/Y = 창 내 커서 위치 = 오프셋 (async IPC 불필요) ──
+  // ── 드래그: startX/Y를 함께 전달해 5px 임계값 이하 이동 무시 ────────
   function handleMascotMouseDown(e) {
     if (e.button !== 0 || !api) return;
     e.preventDefault();
     dragStarted.current = true;
-    api.startDrag({ x: e.clientX, y: e.clientY });
+    api.startDrag({ x: e.clientX, y: e.clientY, startX: e.screenX, startY: e.screenY });
   }
 
-  function handleMascotDoubleClick() {
-    if (!expanded) open();
+  // ── 우클릭: 캐릭터 크기 메뉴 ────────────────────────────────────────
+  function handleMascotContextMenu(e) {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY });
   }
 
-  // ── 창 크기 ─────────────────────────────────────────────────────────
-  function resizeWindow(expand) {
-    // 패널(262) + gap(8) + 캐릭터(200) = 470
-    api?.setWindowSize(expand ? 320 : 200, expand ? 470 : 200);
+  function selectCharSize(size) {
+    setCharSize(size);
+    localStorage.setItem('charSize', size);
+    setContextMenu(null);
   }
 
-  function open() {
-    resizeWindow(true);
+  // ── 더블클릭: 팝업 열기 ──────────────────────────────────────────────
+  async function handleMascotDoubleClick() {
+    if (!expanded) await open();
+  }
+
+  // ── 창 크기 ──────────────────────────────────────────────────────────
+  function resizeWindow(expand, direction = 'up') {
+    api?.setWindowSize(expand ? 320 : 200, expand ? 470 : 200, direction);
+  }
+
+  async function open() {
+    // 창 위치 기반으로 팝업을 위/아래 중 공간이 있는 쪽에 표시
+    const pos = await api?.getWindowPosition();
+    const winY = pos ? pos[1] : 999;
+    const below = winY < 300; // 위에 공간이 충분하지 않으면 아래로
+    expandDir.current = below ? 'down' : 'up';
+    setPanelBelow(below);
+    resizeWindow(true, expandDir.current);
     setExpanded(true);
     setTimeout(() => setPanelVisible(true), 50);
   }
@@ -150,10 +183,10 @@ export default function App() {
     setPanelVisible(false);
     setTimeout(() => {
       setExpanded(false);
+      setPanelBelow(false);
       setView('todo');
     }, 310);
-    // React 리렌더링 완료 후 창 축소 (동시 실행 시 캐릭터가 잘리는 문제 방지)
-    setTimeout(() => resizeWindow(false), 370);
+    setTimeout(() => resizeWindow(false, expandDir.current), 370);
   }
 
   async function changeFolder() {
@@ -168,7 +201,7 @@ export default function App() {
     api?.setKeyColor(color);
   }
 
-  // ── Todo CRUD ───────────────────────────────────────────────────────
+  // ── Todo CRUD ────────────────────────────────────────────────────────
   function addTodo() {
     const text = input.trim();
     if (!text) return;
@@ -185,9 +218,9 @@ export default function App() {
     setTodos(prev => prev.filter(t => t.id !== id));
   }
 
-  // ── 렌더 ────────────────────────────────────────────────────────────
+  // ── 렌더 ─────────────────────────────────────────────────────────────
   return (
-    <div className={`app-root ${expanded ? 'expanded' : ''}`}>
+    <div className={`app-root ${expanded ? 'expanded' : ''} ${panelBelow ? 'panel-below' : ''}`}>
 
       {expanded && (
         <div className={`todo-panel ${panelVisible ? 'panel-show' : 'panel-hide'}`}>
@@ -274,6 +307,7 @@ export default function App() {
         className="mascot"
         onMouseDown={handleMascotMouseDown}
         onDoubleClick={handleMascotDoubleClick}
+        onContextMenu={handleMascotContextMenu}
       >
         <div className={`speech-bubble ${bubbleVisible ? 'show' : 'hide'}`}>{message}</div>
         <img
@@ -281,8 +315,29 @@ export default function App() {
           src={CHARACTER[displayMood]}
           alt="mascot"
           draggable="false"
+          style={{ width: charSize, height: charSize }}
         />
       </div>
+
+      {/* ── 캐릭터 크기 컨텍스트 메뉴 ── */}
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onMouseDown={e => e.stopPropagation()}
+        >
+          <div className="context-menu-title">캐릭터 크기</div>
+          {SIZE_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              className={`context-menu-item ${charSize === opt.value ? 'active' : ''}`}
+              onClick={() => selectCharSize(opt.value)}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

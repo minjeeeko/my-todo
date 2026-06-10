@@ -480,3 +480,59 @@ html, body, #root {
 .save-btn:hover {
   background: var(--key-color);
 }
+
+/* ── 팝업이 캐릭터 아래에 표시되는 경우 ── */
+.panel-below .mascot {
+  bottom: auto;
+  top: 0;
+}
+
+.panel-below .todo-panel {
+  bottom: auto;
+  top: 208px;
+}
+
+/* ── 캐릭터 크기 컨텍스트 메뉴 ── */
+.context-menu {
+  position: absolute;
+  background: #fff;
+  border: 2px solid #111;
+  border-radius: 12px 8px 10px 8px / 8px 10px 8px 12px;
+  padding: 6px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 90px;
+}
+
+.context-menu-title {
+  font-size: 12px;
+  font-family: 'OngleipKonkon', cursive;
+  color: #aaa;
+  padding: 2px 8px 4px;
+  border-bottom: 1px dashed #ddd;
+  margin-bottom: 2px;
+}
+
+.context-menu-item {
+  background: none;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 14px;
+  font-family: 'OngleipKonkon', cursive;
+  color: #111;
+  cursor: pointer;
+  text-align: left;
+}
+
+.context-menu-item:hover {
+  background: #f0f9ff;
+  color: var(--key-color);
+}
+
+.context-menu-item.active {
+  color: var(--key-color);
+  font-weight: bold;
+}

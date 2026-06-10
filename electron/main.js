@@ -95,10 +95,12 @@ function createWindow() {
   let dragInterval = null;
   let dragOffset   = { x: 0, y: 0 };
 
-  ipcMain.on('start-drag', (_, offset) => {
-    dragOffset = offset;
+  ipcMain.on('start-drag', (_, { x: offsetX, y: offsetY, startX, startY }) => {
+    dragOffset = { x: offsetX, y: offsetY };
+    // 5px 이상 움직여야 창이 따라오도록 (더블클릭 시 ghost 방지)
     dragInterval = setInterval(() => {
       const cursor = screen.getCursorScreenPoint();
+      if (Math.abs(cursor.x - startX) < 5 && Math.abs(cursor.y - startY) < 5) return;
       win.setPosition(
         Math.round(cursor.x - dragOffset.x),
         Math.round(cursor.y - dragOffset.y)
@@ -112,12 +114,12 @@ function createWindow() {
 
   ipcMain.handle('get-window-position', () => win.getPosition());
 
-  // ── 창 크기 조절: setBounds로 한 번에 처리 (두 번 호출 시 렌더링 깜빡임 방지) ──
-  ipcMain.handle('set-window-size', (_, { width, height }) => {
+  // ── 창 크기 조절: direction 'up'(기본) = 아래 고정, 'down' = 위 고정 ──
+  ipcMain.handle('set-window-size', (_, { width, height, direction = 'up' }) => {
     const [cx, cy] = win.getPosition();
     const [cw, ch] = win.getSize();
     const newX = cx + cw - width;
-    const newY = cy + ch - height;
+    const newY = direction === 'down' ? cy : cy + ch - height;
     win.setBounds({ x: newX, y: newY, width, height });
   });
 

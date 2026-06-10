@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // 창 크기/위치
-  setWindowSize:     (width, height) => ipcRenderer.invoke('set-window-size', { width, height }),
+  setWindowSize:     (width, height, direction) => ipcRenderer.invoke('set-window-size', { width, height, direction }),
   getWindowPosition: ()              => ipcRenderer.invoke('get-window-position'),
   startDrag:         (offset)        => ipcRenderer.send('start-drag', offset),
   endDrag:           ()              => ipcRenderer.send('end-drag'),
