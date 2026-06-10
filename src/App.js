@@ -126,12 +126,13 @@ export default function App() {
 
   function close() {
     setPanelVisible(false);
+    // 패널 애니메이션(300ms) 완료 후 DOM 제거 + 창 축소를 동시에 처리
+    // (창 축소를 먼저 하면 렌더링 충돌로 캐릭터가 사라지는 문제 발생)
     setTimeout(() => {
       setExpanded(false);
       setView('todo');
-    }, 300);
-    // 창 축소는 패널 애니메이션과 동시에 시작 (캐릭터는 절대위치라 영향 없음)
-    setTimeout(() => resizeWindow(false), 150);
+      resizeWindow(false);
+    }, 310);
   }
 
   async function changeFolder() {

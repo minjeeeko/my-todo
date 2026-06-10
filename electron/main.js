@@ -4,6 +4,11 @@ const fs   = require('fs');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+// Electron 20+: must register custom schemes before app.whenReady()
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'asset', privileges: { secure: true, standard: true, supportFetchAPI: true } }
+]);
+
 const COLLAPSED = { width: 200, height: 200 };
 const EXPANDED  = { width: 320, height: 480 };
 
