@@ -137,6 +137,28 @@ function createWindow() {
     return folder;
   });
 
+  // ── 매일 오후 9시 자동 저장 ───────────────────────────────────────
+  let lastAutoSaveDate = null;
+  const autoSaveInterval = setInterval(() => {
+    const now = new Date();
+    const dateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    if (now.getHours() === 21 && lastAutoSaveDate !== dateKey) {
+      lastAutoSaveDate = dateKey;
+      win.webContents.send('request-auto-save');
+    }
+  }, 30 * 1000);
+
+  ipcMain.on('auto-save-data', (_, { todos, retro }) => {
+    const settings = loadSettings();
+    if (!settings.saveFolder || (todos.length === 0 && !retro)) return;
+    try {
+      const { fileName, content } = buildFileContent(todos, retro);
+      fs.writeFileSync(path.join(settings.saveFolder, fileName), content, 'utf8');
+    } catch (e) {
+      console.error('자동 저장 실패:', e);
+    }
+  });
+
   // ── 종료 시 저장 ──────────────────────────────────────────────────
   let isClosing = false;
   win.on('close', (event) => {
@@ -162,6 +184,7 @@ function createWindow() {
     ipcMain.removeHandler('get-save-folder');
     ipcMain.removeHandler('select-folder');
     if (dragInterval) clearInterval(dragInterval);
+    clearInterval(autoSaveInterval);
     app.quit();
   });
 

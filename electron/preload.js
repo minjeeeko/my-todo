@@ -8,8 +8,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   endDrag:           ()              => ipcRenderer.send('end-drag'),
 
   // 저장
-  getSaveFolder: () => ipcRenderer.invoke('get-save-folder'),
-  selectFolder:  () => ipcRenderer.invoke('select-folder'),
-  onRequestSave: (cb) => ipcRenderer.on('request-save', cb),
-  readyToClose:  (todos) => ipcRenderer.send('ready-to-close', todos),
+  getSaveFolder:    () => ipcRenderer.invoke('get-save-folder'),
+  selectFolder:     () => ipcRenderer.invoke('select-folder'),
+  onRequestSave:    (cb) => ipcRenderer.on('request-save', cb),
+  readyToClose:     (data) => ipcRenderer.send('ready-to-close', data),
+  onRequestAutoSave:(cb) => ipcRenderer.on('request-auto-save', cb),
+  autoSaveData:     (data) => ipcRenderer.send('auto-save-data', data),
 });
