@@ -7,6 +7,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   startDrag:         (offset)        => ipcRenderer.send('start-drag', offset),
   endDrag:           ()              => ipcRenderer.send('end-drag'),
 
+  // 설정
+  getKeyColor:      () => ipcRenderer.invoke('get-key-color'),
+  setKeyColor:      (color) => ipcRenderer.invoke('set-key-color', color),
+
   // 저장
   getSaveFolder:    () => ipcRenderer.invoke('get-save-folder'),
   selectFolder:     () => ipcRenderer.invoke('select-folder'),

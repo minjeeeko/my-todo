@@ -27,6 +27,14 @@ function todayLabel() {
 const api = window.electronAPI;
 let nextId = 1;
 
+function adjustColor(hex, amount) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.min(255, (n >> 16) + amount));
+  const g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amount));
+  const b = Math.max(0, Math.min(255, (n & 0xff) + amount));
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
 export default function App() {
   const [todos, setTodos]               = useState([]);
   const [input, setInput]               = useState('');
@@ -36,6 +44,7 @@ export default function App() {
   const [saveFolder, setSaveFolder]     = useState(null);
   const [view, setView]                 = useState('todo'); // 'todo' | 'retro'
   const [retro, setRetro]               = useState('');
+  const [keyColor, setKeyColor]         = useState('#38bdf8');
 
   const todosRef = useRef(todos);
   const retroRef = useRef(retro);
@@ -69,13 +78,21 @@ export default function App() {
     };
   }, [mood]);
 
-  // ── 최초 실행: 저장 폴더 확인 ──────────────────────────────────────
+  // ── CSS 변수로 키컬러 적용 ──────────────────────────────────────────
+  useEffect(() => {
+    const dark = adjustColor(keyColor, -30);
+    document.documentElement.style.setProperty('--key-color', keyColor);
+    document.documentElement.style.setProperty('--key-color-dark', dark);
+  }, [keyColor]);
+
+  // ── 최초 실행: 저장 폴더 + 키컬러 로드 ────────────────────────────
   useEffect(() => {
     if (!api) return;
     api.getSaveFolder().then(folder => {
       if (folder) setSaveFolder(folder);
       else api.selectFolder().then(s => { if (s) setSaveFolder(s); });
     });
+    api.getKeyColor().then(color => { if (color) setKeyColor(color); });
   }, []);
 
   // ── 종료 시 저장 ────────────────────────────────────────────────────
@@ -139,6 +156,12 @@ export default function App() {
     if (!api) return;
     const selected = await api.selectFolder();
     if (selected) setSaveFolder(selected);
+  }
+
+  function handleColorChange(e) {
+    const color = e.target.value;
+    setKeyColor(color);
+    api?.setKeyColor(color);
   }
 
   // ── Todo CRUD ───────────────────────────────────────────────────────
@@ -208,7 +231,11 @@ export default function App() {
               <span className="footer-count">완료 {checked}개 / 전체 {total}개</span>
               <div className="footer-actions">
                 <button className="retro-btn" onClick={() => setView('retro')}>오늘 회고</button>
-                <button className="folder-btn" onClick={changeFolder}>폴더 변경</button>
+                <button className="icon-btn" onClick={changeFolder} title="폴더 변경">📁</button>
+                <div className="color-btn" title="색상 변경">
+                  🎨
+                  <input type="color" value={keyColor} onChange={handleColorChange} />
+                </div>
               </div>
             </div>
           </>}

@@ -121,6 +121,15 @@ function createWindow() {
     win.setBounds({ x: newX, y: newY, width, height });
   });
 
+  // ── 키컬러 ───────────────────────────────────────────────────────
+  ipcMain.handle('get-key-color', () => loadSettings().keyColor || null);
+
+  ipcMain.handle('set-key-color', (_, color) => {
+    const s = loadSettings();
+    s.keyColor = color;
+    saveSettings(s);
+  });
+
   // ── 저장 폴더 ────────────────────────────────────────────────────
   ipcMain.handle('get-save-folder', () => loadSettings().saveFolder || null);
 
