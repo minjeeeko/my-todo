@@ -39,7 +39,7 @@ export default function App() {
 
   const todosRef = useRef(todos);
   const retroRef = useRef(retro);
-  const isDragging = useRef(false);
+  const dragStarted = useRef(false);
   useEffect(() => { todosRef.current = todos; }, [todos]);
   useEffect(() => { retroRef.current = retro; }, [retro]);
 
@@ -89,8 +89,8 @@ export default function App() {
   // ── mouseup 전역: 드래그 종료 ───────────────────────────────────────
   useEffect(() => {
     const onUp = () => {
-      if (isDragging.current) {
-        isDragging.current = false;
+      if (dragStarted.current) {
+        dragStarted.current = false;
         api?.endDrag();
       }
     };
@@ -98,17 +98,15 @@ export default function App() {
     return () => window.removeEventListener('mouseup', onUp);
   }, []);
 
-  // ── 드래그 시작 ─────────────────────────────────────────────────────
-  async function handleMascotMouseDown(e) {
+  // ── 드래그 시작: clientX/Y = 창 내 커서 위치 = 오프셋 (async IPC 불필요) ──
+  function handleMascotMouseDown(e) {
     if (e.button !== 0 || !api) return;
     e.preventDefault();
-    const pos = await api.getWindowPosition();
-    isDragging.current = true;
-    api.startDrag({ x: e.screenX - pos[0], y: e.screenY - pos[1] });
+    dragStarted.current = true;
+    api.startDrag({ x: e.clientX, y: e.clientY });
   }
 
-  function handleMascotClick() {
-    if (isDragging.current) return;
+  function handleMascotDoubleClick() {
     if (!expanded) open();
   }
 
@@ -239,7 +237,7 @@ export default function App() {
       <div
         className="mascot"
         onMouseDown={handleMascotMouseDown}
-        onClick={handleMascotClick}
+        onDoubleClick={handleMascotDoubleClick}
       >
         <div className={`speech-bubble ${bubbleVisible ? 'show' : 'hide'}`}>{message}</div>
         <img

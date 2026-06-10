@@ -71,7 +71,7 @@ export function useMascotState({ total, checked, lastChecked }) {
       const m = new Date().getMinutes();
       if ([14, 15, 16].includes(h) && m === 0 && h !== prevHourRef.current) {
         prevHourRef.current = h;
-        setTemp('sleepy', 3 * 60 * 1000);
+        setTemp('sleepy', 60 * 1000);
       }
     };
 
