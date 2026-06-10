@@ -159,13 +159,17 @@ function createWindow() {
 
   ipcMain.on('auto-save-data', (_, { todos, retro }) => {
     const settings = loadSettings();
-    if (!settings.saveFolder || (todos.length === 0 && !retro)) return;
-    try {
-      const { fileName, content } = buildFileContent(todos, retro);
-      fs.writeFileSync(path.join(settings.saveFolder, fileName), content, 'utf8');
-    } catch (e) {
-      console.error('자동 저장 실패:', e);
+    const doneTodos = todos.filter(t => t.done);
+    if (settings.saveFolder && (doneTodos.length > 0 || retro)) {
+      try {
+        const { fileName, content } = buildFileContent(doneTodos, retro);
+        fs.writeFileSync(path.join(settings.saveFolder, fileName), content, 'utf8');
+      } catch (e) {
+        console.error('자동 저장 실패:', e);
+      }
     }
+    // 완료 항목 화면에서 제거
+    win.webContents.send('clear-completed');
   });
 
   // ── 종료 시 저장 ──────────────────────────────────────────────────

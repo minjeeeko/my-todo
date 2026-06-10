@@ -104,6 +104,10 @@ export default function App() {
     api.onRequestAutoSave(() =>
       api.autoSaveData({ todos: todosRef.current, retro: retroRef.current })
     );
+    api.onClearCompleted(() => {
+      setTodos(prev => prev.filter(t => !t.done));
+      setRetro('');
+    });
   }, []);
 
   // ── mouseup 전역: 드래그 종료 ───────────────────────────────────────

@@ -18,4 +18,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readyToClose:     (data) => ipcRenderer.send('ready-to-close', data),
   onRequestAutoSave:(cb) => ipcRenderer.on('request-auto-save', cb),
   autoSaveData:     (data) => ipcRenderer.send('auto-save-data', data),
+  onClearCompleted: (cb) => ipcRenderer.on('clear-completed', cb),
 });
