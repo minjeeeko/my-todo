@@ -2,15 +2,21 @@ const { app, BrowserWindow, screen, ipcMain, dialog, protocol } = require('elect
 const path = require('path');
 const fs   = require('fs');
 
-const isDev = !app.isPackaged;
-
 // Electron 20+: must register custom schemes before app.whenReady()
 protocol.registerSchemesAsPrivileged([
   { scheme: 'asset', privileges: { secure: true, standard: true, supportFetchAPI: true } }
 ]);
 
+// 단일 인스턴스 강제: 이미 실행 중이면 기존 창을 포커스하고 종료
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+  process.exit(0);
+}
+
+const isDev = !app.isPackaged;
+
 const COLLAPSED = { width: 200, height: 200 };
-const EXPANDED  = { width: 320, height: 480 };
 
 // ── 설정 파일 ────────────────────────────────────────────────────────
 const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
@@ -75,7 +81,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false, // asset:// 프로토콜 이미지 로드 허용
+      webSecurity: false,
     },
   });
 
@@ -85,7 +91,7 @@ function createWindow() {
     win.loadFile(path.join(__dirname, '../build/index.html'));
   }
 
-  // ── 드래그: main에서 커서 폴링 (창 밖에서도 끊기지 않음) ─────────────
+  // ── 드래그: main에서 커서 폴링 ───────────────────────────────────────
   let dragInterval = null;
   let dragOffset   = { x: 0, y: 0 };
 
@@ -106,15 +112,13 @@ function createWindow() {
 
   ipcMain.handle('get-window-position', () => win.getPosition());
 
-  // ── 창 크기 조절 ──────────────────────────────────────────────────
+  // ── 창 크기 조절: setBounds로 한 번에 처리 (두 번 호출 시 렌더링 깜빡임 방지) ──
   ipcMain.handle('set-window-size', (_, { width, height }) => {
     const [cx, cy] = win.getPosition();
     const [cw, ch] = win.getSize();
-    // 현재 우측 하단 기준점 유지하며 확장/축소
     const newX = cx + cw - width;
     const newY = cy + ch - height;
-    win.setSize(width, height);
-    win.setPosition(newX, newY);
+    win.setBounds({ x: newX, y: newY, width, height });
   });
 
   // ── 저장 폴더 ────────────────────────────────────────────────────
@@ -152,12 +156,23 @@ function createWindow() {
         console.error('저장 실패:', e);
       }
     }
+    // IPC 핸들러 정리 후 종료
+    ipcMain.removeHandler('get-window-position');
+    ipcMain.removeHandler('set-window-size');
+    ipcMain.removeHandler('get-save-folder');
+    ipcMain.removeHandler('select-folder');
+    if (dragInterval) clearInterval(dragInterval);
     app.quit();
+  });
+
+  // 두 번째 인스턴스 실행 시 기존 창을 앞으로 가져옴
+  app.on('second-instance', () => {
+    if (win.isMinimized()) win.restore();
+    win.focus();
   });
 }
 
 app.whenReady().then(() => {
-  // asset:// 프로토콜: 개발 시 public/assets, 빌드 후 resources/assets 서빙
   protocol.registerFileProtocol('asset', (request, callback) => {
     const relative = decodeURIComponent(request.url.replace('asset://', ''));
     const base = isDev
