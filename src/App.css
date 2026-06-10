@@ -56,7 +56,7 @@ html, body, #root {
 .speech-bubble {
   position: relative;
   background: #ffffff;
-  border: 4px solid #111;
+  border: 2px solid #111;
   border-radius: 18px 10px 20px 8px / 8px 20px 10px 18px;
   padding: 6px 13px;
   font-size: 15px;
@@ -71,10 +71,10 @@ html, body, #root {
 .speech-bubble::after {
   content: '';
   position: absolute;
-  bottom: -13px;
+  bottom: -11px;
   left: 50%;
   transform: translateX(-60%);
-  border-width: 11px 7px 0 7px;
+  border-width: 9px 6px 0 6px;
   border-style: solid;
   border-color: #111 transparent transparent transparent;
 }
@@ -82,10 +82,10 @@ html, body, #root {
 .speech-bubble::before {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: -7px;
   left: 50%;
   transform: translateX(-60%);
-  border-width: 8px 5px 0 5px;
+  border-width: 7px 4px 0 4px;
   border-style: solid;
   border-color: #ffffff transparent transparent transparent;
   z-index: 1;
@@ -98,17 +98,10 @@ html, body, #root {
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
-  animation: float 2.5s ease-in-out infinite;
 }
 
 .show { opacity: 1; }
 .hide { opacity: 0; }
-
-@keyframes float {
-  0%   { transform: translateY(0px) rotate(0deg); }
-  50%  { transform: translateY(-8px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
 
 /* ── 할일 패널: 캐릭터 바로 위에 절대 위치 ── */
 .todo-panel {
@@ -118,7 +111,7 @@ html, body, #root {
   width: 300px;
   height: 262px;
   background: #ffffff;
-  border: 4px solid #111;
+  border: 2px solid #111;
   border-radius: 22px 8px 18px 12px / 10px 20px 8px 22px;
   display: flex;
   flex-direction: column;
@@ -167,8 +160,8 @@ html, body, #root {
 }
 
 .close-btn:hover {
-  border-color: #e02020;
-  color: #e02020;
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 
 /* 입력창 */
@@ -192,7 +185,7 @@ html, body, #root {
 }
 
 .todo-input:focus {
-  border-color: #e02020;
+  border-color: #38bdf8;
 }
 
 .todo-input::placeholder {
@@ -200,9 +193,9 @@ html, body, #root {
 }
 
 .add-btn {
-  background: #e02020;
+  background: #38bdf8;
   color: #fff;
-  border: 2px solid #e02020;
+  border: 2px solid #38bdf8;
   border-radius: 10px 8px 11px 9px;
   width: 34px;
   font-size: 22px;
@@ -216,8 +209,8 @@ html, body, #root {
 }
 
 .add-btn:hover {
-  background: #b91c1c;
-  border-color: #b91c1c;
+  background: #0284c7;
+  border-color: #0284c7;
 }
 
 /* 목록 */
@@ -232,7 +225,7 @@ html, body, #root {
   width: 4px;
 }
 .todo-list::-webkit-scrollbar-thumb {
-  background: #e02020;
+  background: #38bdf8;
   border-radius: 2px;
 }
 
@@ -255,14 +248,14 @@ html, body, #root {
 }
 
 .todo-item:hover {
-  background: #fff5f5;
+  background: #f0f9ff;
 }
 
 .todo-checkbox {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #e02020;
+  accent-color: #38bdf8;
   flex-shrink: 0;
 }
 
@@ -291,7 +284,7 @@ html, body, #root {
 }
 
 .delete-btn:hover {
-  color: #e02020;
+  color: #38bdf8;
 }
 
 /* 하단 */
@@ -319,9 +312,9 @@ html, body, #root {
 }
 
 .retro-btn {
-  background: #e02020;
+  background: #38bdf8;
   color: #fff;
-  border: 1.5px solid #e02020;
+  border: 1.5px solid #38bdf8;
   border-radius: 8px 7px 9px 8px;
   padding: 3px 10px;
   font-size: 13px;
@@ -331,8 +324,8 @@ html, body, #root {
 }
 
 .retro-btn:hover {
-  background: #b91c1c;
-  border-color: #b91c1c;
+  background: #0284c7;
+  border-color: #0284c7;
 }
 
 .folder-btn {
@@ -348,8 +341,8 @@ html, body, #root {
 }
 
 .folder-btn:hover {
-  border-color: #e02020;
-  color: #e02020;
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 
 /* ── 회고 뷰 ── */
@@ -385,7 +378,7 @@ html, body, #root {
 .retro-date {
   font-size: 15px;
   font-family: 'OngleipKonkon', cursive;
-  color: #e02020;
+  color: #38bdf8;
   margin-bottom: 10px;
   padding-bottom: 6px;
   border-bottom: 1.5px solid #eee;
@@ -428,5 +421,5 @@ html, body, #root {
 }
 
 .save-btn:hover {
-  background: #e02020;
+  background: #38bdf8;
 }

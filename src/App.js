@@ -188,7 +188,9 @@ export default function App() {
               {todos.length === 0 && (
                 <li className="todo-empty">할 일을 추가해보세요!</li>
               )}
-              {todos.map(t => (
+              {[...todos]
+                .sort((a, b) => a.done - b.done)
+                .map(t => (
                 <li key={t.id} className={`todo-item ${t.done ? 'done' : ''}`}>
                   <input
                     type="checkbox"
