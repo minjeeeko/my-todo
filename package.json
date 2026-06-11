@@ -10,7 +10,7 @@
     "react-build": "react-scripts build",
     "build": "rimraf dist && npm run react-build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --config.mac.target=default --config.win.target=nsis",
     "build:win": "rimraf dist && npm run react-build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
-    "build:mac": "rimraf dist && npm run react-build && electron-builder --mac"
+    "build:mac": "rimraf dist && npm run react-build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -70,7 +70,12 @@
           ]
         }
       ],
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "sign": false,
+      "notarize": false,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "win": {
       "target": [
